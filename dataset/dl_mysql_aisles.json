@@ -1,0 +1,37 @@
+{
+	"name": "dl_mysql_aisles",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MySQL Extraction"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat('Aisles_',\nconvertTimeZone(utcnow(),'UTC','SA Pacific Standard Time','yyyy-MM-dd HH:mm:ss')\n)",
+					"type": "Expression"
+				},
+				"folderPath": "mysql-instance",
+				"container": "bronze-zone"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "department_id",
+				"type": "INT64"
+			},
+			{
+				"name": "department",
+				"type": "UTF8"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,50 @@
+{
+	"name": "Request AWS services",
+	"properties": {
+		"activities": [
+			{
+				"name": "Postman",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://04mywzw4ue.execute-api.us-east-2.amazonaws.com/Prod/deploy_migration/",
+					"method": "POST",
+					"body": {
+						"team": "azr_team",
+						"key": "f68e675b7c54e60236b601763ed76e0c2889768e"
+					}
+				}
+			},
+			{
+				"name": "Wait for 30 mins",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Postman",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1800
+				}
+			}
+		],
+		"folder": {
+			"name": "Extractions"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-07-08T16:25:56Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

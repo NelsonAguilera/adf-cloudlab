@@ -1,0 +1,149 @@
+{
+	"name": "Extractions orchestator",
+	"properties": {
+		"activities": [
+			{
+				"name": "MySQL Extraction",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "S3 Extraction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "MySQL Extraction",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"UTC": {
+							"value": "@pipeline().parameters.UTC_Extract",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "S3 Extraction",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "S3_Extraction",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"UTC": {
+							"value": "@pipeline().parameters.UTC_Extract",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Kinesis Extraction",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "MySQL Extraction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Kinesis Extraction",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"utc": {
+							"value": "@pipeline().parameters.UTC_Extract",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Record Count",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Kinesis Extraction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/1. Extractions/RecordCount_Folders"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Queries",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Record Count",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/1. Extractions/Queries_Validation",
+					"baseParameters": {
+						"utc": {
+							"value": "@pipeline().parameters.UTC_Extract",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"UTC_Extract": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Extractions"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-03-04T20:23:48Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

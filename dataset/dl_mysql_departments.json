@@ -1,0 +1,28 @@
+{
+	"name": "dl_mysql_departments",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MySQL Extraction"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat('Department_',\nconvertTimeZone(utcnow(),'UTC','SA Pacific Standard Time','yyyy-MM-dd HH:mm:ss')\n)",
+					"type": "Expression"
+				},
+				"folderPath": "mysql-instance",
+				"container": "bronze-zone"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

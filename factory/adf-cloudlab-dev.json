@@ -1,0 +1,9 @@
+{
+	"name": "adf-cloudlab-dev",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9aa261e7-c421-4f24-9b28-24bab0bdc87a",
+		"tenantId": "0b3fc178-b730-4e8b-9843-e81259237b77"
+	}
+}

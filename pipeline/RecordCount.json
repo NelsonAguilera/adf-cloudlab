@@ -1,0 +1,37 @@
+{
+	"name": "RecordCount",
+	"properties": {
+		"activities": [
+			{
+				"name": "RecordCount_Test",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_record_count",
+						"type": "DataFlowReference",
+						"parameters": {
+							"UTC": "\"2022-02-14T16_09_45\""
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-02-18T23:53:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,137 @@
+{
+	"name": "MySQL Extraction",
+	"properties": {
+		"activities": [
+			{
+				"name": "Aisles table extraction",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "mysql_aws_aislestable",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dl_Parquet_parameters",
+						"type": "DatasetReference",
+						"parameters": {
+							"contenedor": "bronze-zone",
+							"folder": "mysql-instance/aisles",
+							"filename": {
+								"value": "@concat('Aisles_',\nreplace(pipeline().parameters.UTC,':','_'),\n'.parquet')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Departments table extraction",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Aisles table extraction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "mysql_aws_departmentstable",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dl_Parquet_parameters",
+						"type": "DatasetReference",
+						"parameters": {
+							"contenedor": "bronze-zone",
+							"folder": "mysql-instance/departments",
+							"filename": {
+								"value": "@concat('Departments_',\nreplace(pipeline().parameters.UTC,':','_'),\n'.parquet')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"UTC": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Extractions"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-03-04T21:46:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

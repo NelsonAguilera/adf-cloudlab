@@ -1,0 +1,213 @@
+{
+	"name": "S3_Extraction",
+	"properties": {
+		"activities": [
+			{
+				"name": "Users_email extraction",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Users extraction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": {
+								"value": "@variables('users_email_folder')",
+								"type": "Expression"
+							},
+							"wildcardFileName": "*.csv",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "USR_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "USR_ID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "USER_EMAIL",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "USER_EMAIL",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "dl_csvtfile",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": {
+								"value": "@variables('container_source')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dl_Parquet_parameters",
+						"type": "DatasetReference",
+						"parameters": {
+							"contenedor": {
+								"value": "@variables('container_destination')",
+								"type": "Expression"
+							},
+							"folder": {
+								"value": "@concat('s3-instance/',variables('users_email_folder'))\n",
+								"type": "Expression"
+							},
+							"filename": {
+								"value": "@concat('users_emails_',\nreplace(pipeline().parameters.UTC,':','_'),\n'.parquet')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Users extraction",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Products extraction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/1. Extractions/S3-Users_Table",
+					"baseParameters": {
+						"utc": {
+							"value": "@pipeline().parameters.UTC",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Products extraction",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/1. Extractions/S3-Products_Table",
+					"baseParameters": {
+						"utc": {
+							"value": "@pipeline().parameters.UTC",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"UTC": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"container_source": {
+				"type": "String",
+				"defaultValue": "migration"
+			},
+			"container_destination": {
+				"type": "String",
+				"defaultValue": "bronze-zone"
+			},
+			"users_folder": {
+				"type": "String",
+				"defaultValue": "users"
+			},
+			"users_email_folder": {
+				"type": "String",
+				"defaultValue": "users_emails"
+			},
+			"products_folder": {
+				"type": "String",
+				"defaultValue": "products"
+			}
+		},
+		"folder": {
+			"name": "Extractions"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-03-04T22:57:08Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

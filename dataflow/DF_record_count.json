@@ -1,0 +1,35 @@
+{
+	"name": "DF_record_count",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "AzureDataLakeCloudLabDev",
+						"type": "LinkedServiceReference"
+					},
+					"name": "UsersEmail"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dl_record_count",
+						"type": "DatasetReference"
+					},
+					"name": "RecordcountsUsersEmail"
+				}
+			],
+			"transformations": [
+				{
+					"name": "CountUsersEmail"
+				},
+				{
+					"name": "AddColumndataset"
+				}
+			],
+			"script": "parameters{\n\tUTC as string\n}\nsource(output(\n\t\tUSR_ID as string,\n\t\tUSER_EMAIL as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet',\n\tfileSystem: 'bronze-zone',\n\twildcardPaths:[(\"s3-instance/users_emails/users_email_\"+$UTC+\".parquet\")]) ~> UsersEmail\nUsersEmail aggregate(size = count(USR_ID)) ~> CountUsersEmail\nCountUsersEmail derive(dataset = \"users_emails\",\n\t\tsize = size) ~> AddColumndataset\nAddColumndataset sink(allowSchemaDrift: false,\n\tvalidateSchema: false,\n\tinput(\n\t\tdataset as string,\n\t\tsize as string\n\t),\n\tpartitionFileNames:[(concat(\"record_count_copy_\",$UTC,\".csv\"))],\n\tumask: 0022,\n\tpreCommands: [],\n\tpostCommands: [],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tdataset,\n\t\tsize\n\t),\n\tpartitionBy('hash', 1)) ~> RecordcountsUsersEmail"
+		}
+	}
+}

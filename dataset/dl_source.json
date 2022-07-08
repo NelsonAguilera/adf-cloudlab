@@ -1,0 +1,21 @@
+{
+	"name": "dl_source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeCloudLabDev",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "S3 extraction"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "migration"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

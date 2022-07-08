@@ -1,0 +1,74 @@
+{
+	"name": "Orchestator",
+	"properties": {
+		"activities": [
+			{
+				"name": "Extractions",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "UTC Extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Extractions orchestator",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"UTC_Extract": {
+							"value": "@variables('UTC_Extract')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "UTC Extract",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Request AWS services",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "UTC_Extract",
+					"value": {
+						"value": "@convertTimeZone(utcnow(),'UTC','SA Pacific Standard Time','yyyy-MM-ddTHH:mm:ss')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Request AWS services",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Request AWS services",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"variables": {
+			"UTC_Extract": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-07-08T17:36:32Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,19 @@
+{
+	"name": "mysql_aws_departmentstable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MySql1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MySQL Extraction"
+		},
+		"annotations": [],
+		"type": "MySqlTable",
+		"schema": [],
+		"typeProperties": {
+			"tableName": "`departments`"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

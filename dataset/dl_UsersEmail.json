@@ -1,0 +1,34 @@
+{
+	"name": "dl_UsersEmail",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeCloudLabDev",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "S3 extraction"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "users_email_2022-02-14T16:09:45.parquet",
+				"folderPath": "s3-instance/users_emails",
+				"fileSystem": "bronze-zone"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "USR_ID",
+				"type": "UTF8"
+			},
+			{
+				"name": "USER_EMAIL",
+				"type": "UTF8"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
